@@ -1,0 +1,12 @@
+.build
+.mbed
+projectfiles
+*.py*
+mbed-os
+BUILD
+
+compile_commands.json
+.clangd
+.cache
+drive-motor-lib
+rotary-encoder-lib
