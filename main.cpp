@@ -6,8 +6,10 @@
 #define NECK_RX_MIN 1338
 #define NECK_RX_ACCELERATION 0.2
 #define NECK_RY_THRESHOLD 15
+#define NECK_RY_MAXSPEED 0.85
 #define NECK_RY_ACCELERATION 0.4
 #define NECK_RZ_THRESHOLD 25
+#define NECK_RZ_MAXSPEED 0.85
 #define NECK_RZ_ACCELERATION 0.8
 #define CHIN_MAX 1900
 #define CHIN_MIN 1360
@@ -55,7 +57,8 @@ int main()
 {
     initRobot();
     while (true) {
-        PC.printf("\033[Hneck-ry%5d\r\nneck-rz%5d\r\n", RE_neckry.Get_Count(), RE_neckrz.Get_Count());
+        // PC.printf("\033[Hneck-ry%5d\r\nneck-rz%5d\r\n", RE_neckry.Get_Count(), RE_neckrz.Get_Count());
+        // PC.printf("\033[Hextended_sign_pool: %#04X\r\nchin_sign_pool    : %#04X\r\nneck_rx_sign_pool : %#04X\r\nneck_ry_sign_pool : %#04X\r\nneck_rz_sign_pool : %#04X", extended_sign, chin_sign_pool, neck_rx_sign_pool, neck_ry_sign_pool, neck_rz_sign_pool);
         driveNeckRX();
         driveNeckRY();
         driveNeckRZ();
@@ -87,13 +90,23 @@ void driveNeckRX(void) {
 }
 
 void driveNeckRY(void) {
-    int target_count = neck_ry_sign * 2;
+    int target_count = - neck_ry_sign * 2;
     double current_count = RE_neckry.Get_Count();
     double current_speed = M_neckry.read();
     double target_speed;
     
-    if(target_count - NECK_RY_THRESHOLD > current_count) target_speed = 1.0;
-    else if(target_count + NECK_RY_THRESHOLD < current_count) target_speed = -1.0;
+    if(target_count - NECK_RY_THRESHOLD > current_count) {
+        target_speed = (target_count - current_count) / 30;
+        if(target_speed > NECK_RY_MAXSPEED) {
+            target_speed = NECK_RY_MAXSPEED;
+        }
+    }
+    else if(target_count + NECK_RZ_THRESHOLD < current_count) {
+        target_speed = (target_count - current_count) / 30;
+        if(target_speed < -NECK_RY_MAXSPEED) {
+            target_speed = -NECK_RY_MAXSPEED;
+        }
+    }
     else target_speed = 0;
 
     current_speed += (target_speed - current_speed) * NECK_RY_ACCELERATION;
@@ -108,21 +121,20 @@ void driveNeckRZ(void) {
     
     if(target_count - NECK_RZ_THRESHOLD > current_count) {
         target_speed = (target_count - current_count) / 50;
-        if(target_speed > 0.85) {
-            target_speed = 0.85;
+        if(target_speed > NECK_RZ_MAXSPEED) {
+            target_speed = NECK_RZ_MAXSPEED;
         }
-        target_speed *= 0.8;
     }
     else if(target_count + NECK_RZ_THRESHOLD < current_count) {
         target_speed = (target_count - current_count) / 50;
-        if(target_speed < -0.85) {
-            target_speed = -0.85;
+        if(target_speed < -NECK_RZ_MAXSPEED) {
+            target_speed = -NECK_RZ_MAXSPEED;
         }
     }
     else target_speed = 0;
 
     current_speed += (target_speed - current_speed) * NECK_RZ_ACCELERATION;
-    PC.printf("target :%4d\r\nM_neckrz:%5.2lf\r\n", target_count, current_speed);
+    // PC.printf("target :%4d\r\nM_neckrz:%5.2lf\r\n", target_count, current_speed);
     M_neckrz.drive(current_speed); 
 }
 
@@ -160,10 +172,13 @@ inline void receiveSignal(void) {
                 if(((check_sum % 0x100) == read_sign) || ((check_sum == 0xFF) && (read_sign == 0xFE))) {
                     check_sum_correct = 1;
                     extended_sign = extended_sign_pool;
-                    chin_sign = chin_sign_pool;
-                    neck_rx_sign = neck_rx_sign_pool;
-                    neck_ry_sign = neck_ry_sign_pool;
-                    neck_rz_sign = neck_rz_sign_pool;
+                    int encoder_lock = (extended_sign >> 1) % 0b10;
+                    if(!encoder_lock) {
+                        chin_sign = chin_sign_pool;
+                        neck_rx_sign = neck_rx_sign_pool;
+                        neck_ry_sign = neck_ry_sign_pool;
+                        neck_rz_sign = neck_rz_sign_pool;
+                    }
                 }
                 else {
                     check_sum_correct = 0;
