@@ -62,7 +62,18 @@ int main()
         driveNeckRX();
         driveNeckRY();
         driveNeckRZ();
-        driveChin();        
+        driveChin();
+
+        if(SPI_main.receive()) {
+            if(SPI_main.read() == 0xFF00) {
+                if(check_sum_correct) {
+                    SPI_main.reply(0x00FF);
+                }
+                else {
+                    SPI_main.reply(0x0000);
+                }
+            }
+        }        
     }
 }
 
@@ -114,7 +125,7 @@ void driveNeckRY(void) {
 }
 
 void driveNeckRZ(void) {
-    int target_count = (int)((neck_rz_sign - 0x80) * 1.5);
+    int target_count = (int)((neck_rz_sign - 0x80) * 1.34);
     double current_count = -RE_neckrz.Get_Count();
     double current_speed = M_neckrz.read();
     double target_speed;
@@ -164,8 +175,8 @@ inline void receiveSignal(void) {
             case 0: check_sum = 0x00; ++octets; break;
             case 1: extended_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
             case 2: chin_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
-            case 3: neck_rx_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
-            case 4: neck_ry_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
+            case 3: neck_ry_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
+            case 4: neck_rx_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
             case 5: neck_rz_sign_pool = read_sign; check_sum += read_sign; ++octets; break;
             case 6: 
                 check_sum_sign = read_sign;
