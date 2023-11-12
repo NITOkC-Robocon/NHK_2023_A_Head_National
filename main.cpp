@@ -7,8 +7,8 @@
 #define NECK_RX_ACCELERATION 0.2
 #define NECK_RY_THRESHOLD 15
 #define NECK_RY_MAXSPEED 0.85
-#define NECK_RY_ACCELERATION 0.4
-#define NECK_RZ_THRESHOLD 25
+#define NECK_RY_ACCELERATION 0.1
+#define NECK_RZ_THRESHOLD 10
 #define NECK_RZ_MAXSPEED 0.85
 #define NECK_RZ_ACCELERATION 0.8
 #define CHIN_MAX 1900
@@ -112,7 +112,7 @@ void driveNeckRY(void) {
             target_speed = NECK_RY_MAXSPEED;
         }
     }
-    else if(target_count + NECK_RZ_THRESHOLD < current_count) {
+    else if(target_count + NECK_RY_THRESHOLD < current_count) {
         target_speed = (target_count - current_count) / 30;
         if(target_speed < -NECK_RY_MAXSPEED) {
             target_speed = -NECK_RY_MAXSPEED;
