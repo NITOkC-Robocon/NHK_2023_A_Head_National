@@ -5,7 +5,7 @@
 #define NECK_RX_MAX 1722
 #define NECK_RX_MIN 1338
 #define NECK_RX_ACCELERATION 0.2
-#define NECK_RY_THRESHOLD 15
+#define NECK_RY_THRESHOLD 25
 #define NECK_RY_MAXSPEED 0.85
 #define NECK_RY_ACCELERATION 0.1
 #define NECK_RZ_THRESHOLD 10
@@ -101,7 +101,7 @@ void driveNeckRX(void) {
 }
 
 void driveNeckRY(void) {
-    int target_count = - neck_ry_sign * 2;
+    int target_count = - neck_ry_sign * 2.2;
     double current_count = RE_neckry.Get_Count();
     double current_speed = M_neckry.read();
     double target_speed;
