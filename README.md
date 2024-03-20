@@ -23,6 +23,6 @@
 [Resenaga_Byakko (Shogo Miyazato)](https://github.com/ByakkoMatsumiya)
 
 ## 連絡先
-基板またはコードに関するお問い合わせは、[Issues](https://github.com/NITOkC-Robocon/NITOC-Robocon_HP/issues)または下記連絡先へお願い致します。
+基板またはコードに関するお問い合わせは、[Issues](https://github.com/NITOkC-Robocon/NHK_2023_A_Head_National/issues)または下記連絡先へお願い致します。
 - [Twitter | @Seyanaga (趣味用アカウント)](https://twitter.com/Seyanaga)
 - [Twitter | @Myaaaazato (ロボコン用アカウント)](https://twitter.com/Myaaaazato)
